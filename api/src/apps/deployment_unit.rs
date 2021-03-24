@@ -113,7 +113,7 @@ impl DeploymentUnit {
     {
         for config in configs {
             if let Some(port) = port_mappings.get(config.image()) {
-                config.set_port(port.clone());
+                config.set_port(*port);
             }
         }
     }

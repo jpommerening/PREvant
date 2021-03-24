@@ -106,7 +106,7 @@ impl WebHostMeta {
     pub fn date_modified(&self) -> Option<DateTime<Utc>> {
         match &self.properties {
             None => None,
-            Some(properties) => properties.date_modified.clone(),
+            Some(properties) => properties.date_modified,
         }
     }
 

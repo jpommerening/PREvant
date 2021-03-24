@@ -436,7 +436,7 @@ impl DockerInfrastructure {
         options.restart_policy("always", 5);
 
         if let Some(memory_limit) = container_config.memory_limit() {
-            options.memory(memory_limit.clone());
+            options.memory(memory_limit);
         }
 
         options.build()
@@ -869,7 +869,7 @@ impl TryFrom<&ContainerDetails> for Service {
             }
         };
 
-        let started_at = container_details.state.started_at.clone();
+        let started_at = container_details.state.started_at;
         let status = if container_details.state.running {
             ServiceStatus::Running
         } else {
