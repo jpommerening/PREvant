@@ -564,7 +564,7 @@ impl Infrastructure for KubernetesInfrastructure {
             .filter(move |(index, _)| index < &limit)
             .filter(|(_, line)| !line.is_empty())
             .map(|(_, line)| {
-                let mut iter = line.splitn(2, ' ').into_iter();
+                let mut iter = line.splitn(2, ' ');
                 let timestamp = iter.next().expect(
                     "This should never happen: kubernetes should return timestamps, separated by space",
                 );

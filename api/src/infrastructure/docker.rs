@@ -715,7 +715,7 @@ impl Infrastructure for DockerInfrastructure {
                     .map(|chunk| {
                         let line = String::from_utf8_lossy(&chunk.to_vec()).to_string();
 
-                        let mut iter = line.splitn(2, ' ').into_iter();
+                        let mut iter = line.splitn(2, ' ');
                         let timestamp = iter.next()
                             .expect("This should never happen: docker should return timestamps, separated by space");
 

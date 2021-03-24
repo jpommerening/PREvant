@@ -26,7 +26,7 @@
 
 #![feature(proc_macro_hygiene, decl_macro)]
 #![allow(clippy::all)]
-#![deny(clippy::op_ref)]
+#![deny(clippy::useless_conversion)]
 
 #[macro_use]
 extern crate clap;
