@@ -182,7 +182,7 @@ impl<'de> Deserialize<'de> for Image {
             where
                 E: serde::de::Error,
             {
-                Ok(Image::from_str(v).map_err(serde::de::Error::custom)?)
+                Image::from_str(v).map_err(serde::de::Error::custom)
             }
         }
 

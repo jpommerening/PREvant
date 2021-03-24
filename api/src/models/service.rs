@@ -184,7 +184,7 @@ impl Serialize for Service {
             state: &self.state,
         };
 
-        Ok(s.serialize(serializer)?)
+        s.serialize(serializer)
     }
 }
 
