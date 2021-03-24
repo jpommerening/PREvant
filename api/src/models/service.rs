@@ -350,10 +350,10 @@ impl FromStr for ContainerType {
 impl Display for ContainerType {
     fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
         match self {
-            &ContainerType::Instance => write!(f, "instance"),
-            &ContainerType::Replica => write!(f, "replica"),
-            &ContainerType::ApplicationCompanion => write!(f, "app-companion"),
-            &ContainerType::ServiceCompanion => write!(f, "service-companion"),
+            ContainerType::Instance => write!(f, "instance"),
+            ContainerType::Replica => write!(f, "replica"),
+            ContainerType::ApplicationCompanion => write!(f, "app-companion"),
+            ContainerType::ServiceCompanion => write!(f, "service-companion"),
         }
     }
 }
