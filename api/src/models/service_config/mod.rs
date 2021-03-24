@@ -154,11 +154,11 @@ impl ServiceConfig {
         self.middlewares = Some(middlewares);
     }
 
-    pub fn middlewares<'a, 'b: 'a>(&'b self) -> Option<&BTreeMap<String, Value>> {
+    pub fn middlewares(&self) -> Option<&BTreeMap<String, Value>> {
         self.middlewares.as_ref()
     }
 
-    pub fn traefik_middlewares<'a, 'b: 'a>(&'b self, app_name: &str) -> BTreeMap<String, Value> {
+    pub fn traefik_middlewares(&self, app_name: &str) -> BTreeMap<String, Value> {
         match &self.middlewares {
             None => {
                 let mut prefixes = BTreeMap::new();
