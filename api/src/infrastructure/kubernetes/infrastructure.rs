@@ -330,7 +330,7 @@ impl KubernetesInfrastructure {
             Ok(result) => {
                 debug!(
                     "Successfully created namespace {}",
-                    result.metadata.name.unwrap_or(String::from("<unknown>"))
+                    result.metadata.name.unwrap()
                 );
                 Ok(())
             }
@@ -364,10 +364,7 @@ impl KubernetesInfrastructure {
             .await
         {
             Ok(result) => {
-                debug!(
-                    "Successfully deployed {}",
-                    result.metadata.name.unwrap_or(String::from("<unknown>"))
-                );
+                debug!("Successfully deployed {}", result.metadata.name.unwrap());
                 self.post_service_and_custom_resource_definitions(app_name, service_config)
                     .await?;
                 Ok(service_config)
@@ -414,10 +411,7 @@ impl KubernetesInfrastructure {
             .await
         {
             Ok(result) => {
-                debug!(
-                    "Successfully deployed {}",
-                    result.metadata.name.unwrap_or(String::from("<unknown>"))
-                );
+                debug!("Successfully deployed {}", result.metadata.name.unwrap());
                 Ok(())
             }
             Err(KubeError::Api(ErrorResponse { code, .. })) if code == 409 => {

@@ -169,7 +169,7 @@ fn is_not_companion<'reg, 'rc>(
         .param(0)
         .map(|v| v.value())
         .map(|v| v.as_str().unwrap())
-        .ok_or(RenderError::new("parameter type is required"))?;
+        .ok_or_else(|| RenderError::new("parameter type is required"))?;
 
     let container_type = ContainerType::from_str(s)
         .map_err(|e| RenderError::new(format!("Invalid type parameter {:?}. {}", s, e)))?;
@@ -197,7 +197,7 @@ fn is_companion<'reg, 'rc>(
         .param(0)
         .map(|v| v.value())
         .map(|v| v.as_str().unwrap())
-        .ok_or(RenderError::new("parameter type is required"))?;
+        .ok_or_else(|| RenderError::new("parameter type is required"))?;
 
     let container_type = ContainerType::from_str(s)
         .map_err(|e| RenderError::new(format!("Invalid type paramter {:?}. {}", s, e)))?;

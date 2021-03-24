@@ -62,7 +62,7 @@ impl Into<(PathBuf, SecUtf8)> for Secret {
         (
             self.path
                 .map(|path| path.join(&name))
-                .unwrap_or(PathBuf::from(format!("/run/secrets/{}", &name))),
+                .unwrap_or_else(|| PathBuf::from(format!("/run/secrets/{}", &name))),
             self.secret,
         )
     }

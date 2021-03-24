@@ -220,7 +220,7 @@ impl ServiceBuilder {
         let config = self
             .config
             .ok_or(ServiceBuilderError::MissingServiceConfiguration)?;
-        let started_at = self.started_at.unwrap_or(Utc::now());
+        let started_at = self.started_at.unwrap_or_else(Utc::now);
 
         Ok(Service {
             id,
