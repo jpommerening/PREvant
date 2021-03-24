@@ -125,6 +125,12 @@ impl Service {
     }
 }
 
+impl Default for ServiceBuilder {
+    fn default() -> Self {
+        ServiceBuilder::new()
+    }
+}
+
 impl Serialize for Service {
     fn serialize<S>(&self, serializer: S) -> Result<<S as Serializer>::Ok, <S as Serializer>::Error>
     where

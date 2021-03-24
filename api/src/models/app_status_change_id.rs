@@ -37,6 +37,12 @@ impl AppStatusChangeId {
     }
 }
 
+impl Default for AppStatusChangeId {
+    fn default() -> Self {
+        AppStatusChangeId::new()
+    }
+}
+
 impl std::fmt::Display for AppStatusChangeId {
     fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
         write!(f, "{}", self.0.to_hyphenated())

@@ -107,6 +107,12 @@ impl ImagesService {
     }
 }
 
+impl Default for ImagesService {
+    fn default() -> Self {
+        ImagesService::new()
+    }
+}
+
 #[derive(Deserialize)]
 struct ImageBlob {
     config: ImageConfig,

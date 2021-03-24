@@ -578,6 +578,12 @@ impl DockerInfrastructure {
     }
 }
 
+impl Default for DockerInfrastructure {
+    fn default() -> Self {
+        DockerInfrastructure::new()
+    }
+}
+
 #[async_trait]
 impl Infrastructure for DockerInfrastructure {
     async fn get_services(&self) -> Result<MultiMap<String, Service>, Error> {
