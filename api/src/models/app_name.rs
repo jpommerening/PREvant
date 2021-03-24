@@ -69,7 +69,7 @@ impl FromStr for AppName {
                     .collect::<Vec<&str>>()
                     .join("");
 
-                return Err(AppNameError::InvalidChars { invalid_chars });
+                Err(AppNameError::InvalidChars { invalid_chars })
             }
         }
     }
