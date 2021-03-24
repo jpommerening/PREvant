@@ -153,18 +153,12 @@ impl KubernetesInfrastructure {
             .unwrap_or_else(|| "".to_string());
         let mut builder = ServiceBuilder::try_from(deployment)?;
 
-        let mut p = ListParams::default();
-        p.label_selector = Some(format!(
-            "{}={},{}={}",
-            APP_NAME_LABEL,
-            builder
-                .current_app_name()
-                .map_or_else(|| "", |name| name.as_str()),
-            SERVICE_NAME_LABEL,
+        let p = list_param(
+            builder.current_app_name().map(|name| name.as_str()),
             builder
                 .current_config()
-                .map_or_else(|| "", |config| config.service_name()),
-        ));
+                .map(|config| config.service_name().as_str()),
+        );
         if let Some(pod) = Api::<V1Pod>::namespaced(self.client()?, &namespace)
             .list(&p)
             .await?
@@ -207,11 +201,7 @@ impl KubernetesInfrastructure {
         &self,
         app_name: &str,
     ) -> Result<Vec<Service>, KubernetesInfrastructureError> {
-        let mut p = ListParams::default();
-        p.label_selector = Some(format!(
-            "{}={},{}",
-            APP_NAME_LABEL, app_name, SERVICE_NAME_LABEL
-        ));
+        let p = list_param(Some(app_name), None);
 
         let mut services = Vec::new();
         let futures = Api::<V1Deployment>::all(self.client()?)
@@ -242,11 +232,7 @@ impl KubernetesInfrastructure {
         app_name: &str,
         service_name: &str,
     ) -> Result<Option<Service>, KubernetesInfrastructureError> {
-        let mut p = ListParams::default();
-        p.label_selector = Some(format!(
-            "{}={},{}={}",
-            APP_NAME_LABEL, app_name, SERVICE_NAME_LABEL, service_name
-        ));
+        let p = list_param(Some(app_name), Some(service_name));
 
         match Api::<V1Deployment>::all(self.client()?)
             .list(&p)
@@ -266,14 +252,6 @@ impl KubernetesInfrastructure {
         app_name: &str,
         service_config: &ServiceConfig,
     ) -> Result<(), KubernetesInfrastructureError> {
-        let mut p = ListParams::default();
-        p.label_selector = Some(format!(
-            "{}={},{}={}",
-            APP_NAME_LABEL,
-            app_name,
-            SERVICE_NAME_LABEL,
-            service_config.service_name(),
-        ));
         Api::namespaced(self.client()?, app_name)
             .create(
                 &PostParams::default(),
@@ -465,8 +443,7 @@ impl KubernetesInfrastructure {
 #[async_trait]
 impl Infrastructure for KubernetesInfrastructure {
     async fn get_services(&self) -> Result<MultiMap<String, Service>, Error> {
-        let mut p = ListParams::default();
-        p.label_selector = Some(format!("{},{}", APP_NAME_LABEL, SERVICE_NAME_LABEL));
+        let p = list_param(None, None);
 
         let mut apps = MultiMap::new();
         for deployment in Api::<V1Deployment>::all(self.client()?)
@@ -542,11 +519,7 @@ impl Infrastructure for KubernetesInfrastructure {
         from: &Option<DateTime<FixedOffset>>,
         limit: usize,
     ) -> Result<Option<Vec<(DateTime<FixedOffset>, String)>>, Error> {
-        let mut p = ListParams::default();
-        p.label_selector = Some(format!(
-            "{}={},{}={}",
-            APP_NAME_LABEL, app_name, SERVICE_NAME_LABEL, service_name,
-        ));
+        let p = list_param(Some(app_name), Some(service_name));
         let pod = match Api::<V1Pod>::namespaced(self.client()?, app_name)
             .list(&p)
             .await?
@@ -559,9 +532,7 @@ impl Infrastructure for KubernetesInfrastructure {
             }
         };
 
-        let mut p = LogParams::default();
-        p.timestamps = true;
-        p.since_seconds = from
+        let since_seconds = from
             .map(|from| {
                 from.timestamp()
                     - pod
@@ -575,6 +546,11 @@ impl Infrastructure for KubernetesInfrastructure {
                         .timestamp()
             })
             .filter(|since_seconds| since_seconds > &0);
+        let p = LogParams {
+            timestamps: true,
+            since_seconds,
+            ..Default::default()
+        };
 
         let logs = Api::<V1Pod>::namespaced(self.client()?, app_name)
             .logs(&pod.metadata.name.unwrap(), &p)
@@ -630,6 +606,17 @@ impl Infrastructure for KubernetesInfrastructure {
 
         Ok(Some(service))
     }
+}
+
+/// Helper function to build ListParams
+fn list_param(app_name: Option<&str>, service_name: Option<&str>) -> ListParams {
+    let selector = match (app_name, service_name) {
+        (Some(a), Some(s)) => format!("{}={},{}={}", APP_NAME_LABEL, a, SERVICE_NAME_LABEL, s),
+        (Some(a), None) => format!("{}={},{}", APP_NAME_LABEL, a, SERVICE_NAME_LABEL),
+        (None, Some(s)) => format!("{},{}={}", APP_NAME_LABEL, SERVICE_NAME_LABEL, s),
+        (None, None) => format!("{},{}", APP_NAME_LABEL, SERVICE_NAME_LABEL),
+    };
+    ListParams::default().labels(&selector)
 }
 
 impl TryFrom<V1Deployment> for ServiceBuilder {
