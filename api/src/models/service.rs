@@ -105,17 +105,11 @@ impl Service {
     }
 
     pub fn port(&self) -> Option<u16> {
-        match &self.endpoint {
-            None => None,
-            Some(endpoint) => Some(endpoint.exposed_port),
-        }
+        self.endpoint.as_ref().map(|endpoint| endpoint.exposed_port)
     }
 
     pub fn endpoint_url(&self) -> Option<Url> {
-        match &self.endpoint {
-            None => None,
-            Some(endpoint) => Some(endpoint.to_url()),
-        }
+        self.endpoint.as_ref().map(|endpoint| endpoint.to_url())
     }
 
     pub fn started_at(&self) -> &DateTime<Utc> {

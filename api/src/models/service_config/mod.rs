@@ -96,10 +96,7 @@ impl ServiceConfig {
     }
 
     pub fn env<'a, 'b: 'a>(&'b self) -> Option<&'a Environment> {
-        match &self.env {
-            None => None,
-            Some(env) => Some(&env),
-        }
+        self.env.as_ref()
     }
 
     #[deprecated]
@@ -109,10 +106,7 @@ impl ServiceConfig {
 
     #[deprecated]
     pub fn labels<'a, 'b: 'a>(&'b self) -> Option<&'a BTreeMap<String, String>> {
-        match &self.labels {
-            None => None,
-            Some(labels) => Some(&labels),
-        }
+        self.labels.as_ref()
     }
 
     pub fn add_volume(&mut self, path: PathBuf, data: String) {
@@ -130,10 +124,7 @@ impl ServiceConfig {
     }
 
     pub fn volumes<'a, 'b: 'a>(&'b self) -> Option<&'a BTreeMap<PathBuf, String>> {
-        match &self.volumes {
-            None => None,
-            Some(volumes) => Some(volumes),
-        }
+        self.volumes.as_ref()
     }
 
     pub fn set_port(&mut self, port: u16) {
@@ -149,10 +140,7 @@ impl ServiceConfig {
     }
 
     pub fn router<'a, 'b: 'a>(&'b self) -> Option<&'a Router> {
-        match &self.router {
-            None => None,
-            Some(router) => Some(&router),
-        }
+        self.router.as_ref()
     }
 
     pub fn traefik_rule(&self, app_name: &str) -> String {
@@ -167,10 +155,7 @@ impl ServiceConfig {
     }
 
     pub fn middlewares<'a, 'b: 'a>(&'b self) -> Option<&BTreeMap<String, Value>> {
-        match &self.middlewares {
-            None => None,
-            Some(middlewares) => Some(middlewares),
-        }
+        self.middlewares.as_ref()
     }
 
     pub fn traefik_middlewares<'a, 'b: 'a>(&'b self, app_name: &str) -> BTreeMap<String, Value> {
