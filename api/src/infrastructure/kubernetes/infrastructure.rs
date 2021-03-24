@@ -323,6 +323,8 @@ impl KubernetesInfrastructure {
         }
     }
 
+    // False positive: https://github.com/rust-lang/rust-clippy/issues/5787
+    #[allow(clippy::needless_lifetimes)]
     async fn deploy_service<'a>(
         &self,
         app_name: &str,
