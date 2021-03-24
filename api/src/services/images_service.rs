@@ -50,10 +50,9 @@ impl ImagesService {
         let futures = images
             .iter()
             .filter_map(|image| match image {
-                Image::Named { .. } => Some(image),
+                Image::Named { .. } => Some(ImagesService::resolve_image_blob(&image)),
                 Image::Digest { .. } => None,
             })
-            .map(|image| ImagesService::resolve_image_blob(&image))
             .collect::<Vec<_>>();
         let blobs = join_all(futures).await;
 
