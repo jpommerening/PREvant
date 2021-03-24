@@ -56,14 +56,15 @@ impl Secret {
     }
 }
 
-impl Into<(PathBuf, SecUtf8)> for Secret {
-    fn into(self) -> (PathBuf, SecUtf8) {
-        let name = self.name;
+impl From<Secret> for (PathBuf, SecUtf8) {
+    fn from(secret: Secret) -> Self {
+        let name = secret.name;
         (
-            self.path
+            secret
+                .path
                 .map(|path| path.join(&name))
                 .unwrap_or_else(|| PathBuf::from(format!("/run/secrets/{}", &name))),
-            self.secret,
+            secret.secret,
         )
     }
 }
