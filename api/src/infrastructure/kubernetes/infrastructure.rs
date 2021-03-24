@@ -119,10 +119,8 @@ impl KubernetesInfrastructure {
         }
 
         if let Some(certs) = &self.cluster_ca {
-            let result: Result<Vec<Der>, ErrorStack> = certs
-                .into_iter()
-                .map(|cert| Ok(Der(cert.to_der()?)))
-                .collect();
+            let result: Result<Vec<Der>, ErrorStack> =
+                certs.iter().map(|cert| Ok(Der(cert.to_der()?))).collect();
             let ders = result.map_err(|err| KubernetesInfrastructureError::CertificateError {
                 internal_message: format!("{}", err),
             })?;
@@ -559,7 +557,7 @@ impl Infrastructure for KubernetesInfrastructure {
             .await?;
 
         let logs = logs
-            .split("\n")
+            .split('\n')
             .enumerate()
             // Unfortunately,  API does not support head (also like docker, cf. https://github.com/moby/moby/issues/13096)
             // Until then we have to skip these log messages which is super slow…

@@ -144,7 +144,7 @@ pub fn create_app(
     let app_name = app_name?;
     let app_name_cloned = app_name.clone();
     let replicate_from = create_app_form.replicate_from().clone();
-    let service_configs = service_configs_data.service_configs.clone();
+    let service_configs = service_configs_data.service_configs;
 
     let apps = apps.clone();
     let future = async move {

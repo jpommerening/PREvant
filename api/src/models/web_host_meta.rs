@@ -92,7 +92,7 @@ impl WebHostMeta {
             Some(links) => links
                 .iter()
                 .find(|link| link.rel == "https://github.com/OAI/OpenAPI-Specification")
-                .and_then(|link| Some(link.href.clone())),
+                .map(|link| link.href.clone()),
         }
     }
 
