@@ -26,13 +26,7 @@
 
 #![feature(proc_macro_hygiene, decl_macro)]
 #![allow(clippy::all)]
-#![deny(
-    clippy::bind_instead_of_map,
-    clippy::into_iter_on_ref,
-    clippy::redundant_clone,
-    clippy::redundant_closure,
-    clippy::single_char_pattern
-)]
+#![deny(clippy::unnecessary_lazy_evaluations)]
 
 #[macro_use]
 extern crate clap;

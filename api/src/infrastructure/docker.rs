@@ -729,7 +729,7 @@ impl Infrastructure for DockerInfrastructure {
                     .filter(move |(timestamp, _)| {
                         // Due to the fact that docker's REST API supports only unix time (cf. since),
                         // it is necessary to filter the timestamps as well.
-                        from.map(|from| timestamp >= &from).unwrap_or_else(|| true)
+                        from.map(|from| timestamp >= &from).unwrap_or(true)
                     })
                     .collect();
 
