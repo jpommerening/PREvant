@@ -51,7 +51,7 @@ impl Environment {
 
     pub fn variable<'a, 'b: 'a>(&'b self, env_name: &str) -> Option<&'a EnvironmentVariable> {
         for env in &self.values {
-            if &env.key == env_name {
+            if env.key == env_name {
                 return Some(env);
             }
         }

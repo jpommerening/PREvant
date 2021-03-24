@@ -77,7 +77,7 @@ impl<'a, 'r> FromRequest<'a, 'r> for RequestInfo {
             return Outcome::Failure((Status::BadRequest, ()));
         }
 
-        let url_string = "http://".to_owned() + &hosts[0];
+        let url_string = "http://".to_owned() + hosts[0];
         match Url::parse(&url_string) {
             Ok(url) => Outcome::Success(RequestInfo { base_url: url }),
             Err(_) => Outcome::Failure((Status::BadRequest, ())),

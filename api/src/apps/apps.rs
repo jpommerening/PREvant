@@ -148,7 +148,7 @@ impl AppsService {
             .entry(app_name.clone())
             .or_insert_with(|| Arc::new(AppGuard::new(app_name.clone(), kind)));
 
-        if &guard.kind != &kind {
+        if guard.kind != kind {
             match guard.kind {
                 AppGuardKind::Deletion => Err(AppsServiceError::AppIsInDeletion { app_name }),
                 AppGuardKind::Deployment => Err(AppsServiceError::AppIsInDeployment { app_name }),
