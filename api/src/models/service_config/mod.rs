@@ -212,16 +212,12 @@ impl ServiceConfig {
             }
         }
 
-        let mut volumes = other
-            .volumes
-            .as_ref()
-            .map(|v| v.clone())
-            .unwrap_or_default();
-        volumes.extend(self.volumes.as_ref().map(|v| v.clone()).unwrap_or_default());
+        let mut volumes = other.volumes.as_ref().cloned().unwrap_or_default();
+        volumes.extend(self.volumes.as_ref().cloned().unwrap_or_default());
         self.volumes = Some(volumes);
 
-        let mut labels = other.labels.as_ref().map(|v| v.clone()).unwrap_or_default();
-        labels.extend(self.labels.as_ref().map(|v| v.clone()).unwrap_or_default());
+        let mut labels = other.labels.as_ref().cloned().unwrap_or_default();
+        labels.extend(self.labels.as_ref().cloned().unwrap_or_default());
         self.labels = Some(labels);
     }
 }
