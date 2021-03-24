@@ -98,7 +98,6 @@ impl AppGuard {
             .expect("Here it is expected that the deletion result is always present")
     }
 
-    #[must_use]
     fn notify_with_result(
         &self,
         apps_service: &AppsService,
@@ -137,7 +136,6 @@ impl AppsService {
         Ok(self.infrastructure.get_services().await?)
     }
 
-    #[must_use]
     fn create_or_get_app_guard(
         &self,
         app_name: AppName,
