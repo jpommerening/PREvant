@@ -86,7 +86,7 @@ impl DockerInfrastructure {
 
     async fn find_status_change_container(
         &self,
-        status_id: &String,
+        status_id: &str,
     ) -> Result<Option<Container>, ShipLiftError> {
         self.get_status_change_containers(None, Some(status_id))
             .await
@@ -95,7 +95,7 @@ impl DockerInfrastructure {
 
     async fn create_status_change_container(
         &self,
-        status_id: &String,
+        status_id: &str,
         app_name: &str,
     ) -> Result<ContainerDetails, Error> {
         let existing_task = self
@@ -134,7 +134,7 @@ impl DockerInfrastructure {
         Ok(container.inspect().await?)
     }
 
-    async fn create_or_get_network_id(&self, app_name: &String) -> Result<String, ShipLiftError> {
+    async fn create_or_get_network_id(&self, app_name: &str) -> Result<String, ShipLiftError> {
         trace!("Resolve network id for {}", app_name);
 
         let network_name = format!("{}-net", app_name);
@@ -167,7 +167,7 @@ impl DockerInfrastructure {
         Ok(network_create_info.id)
     }
 
-    async fn connect_traefik(&self, network_id: &String) -> Result<(), ShipLiftError> {
+    async fn connect_traefik(&self, network_id: &str) -> Result<(), ShipLiftError> {
         let docker = Docker::new();
 
         let containers = docker
@@ -193,7 +193,7 @@ impl DockerInfrastructure {
         Ok(())
     }
 
-    async fn disconnect_traefik(&self, network_id: &String) -> Result<(), ShipLiftError> {
+    async fn disconnect_traefik(&self, network_id: &str) -> Result<(), ShipLiftError> {
         let docker = Docker::new();
 
         let containers = docker
@@ -216,7 +216,7 @@ impl DockerInfrastructure {
         Ok(())
     }
 
-    async fn delete_network(&self, app_name: &String) -> Result<(), ShipLiftError> {
+    async fn delete_network(&self, app_name: &str) -> Result<(), ShipLiftError> {
         let network_name = format!("{}-net", app_name);
 
         let docker = Docker::new();
@@ -236,8 +236,8 @@ impl DockerInfrastructure {
 
     async fn deploy_services_impl(
         &self,
-        app_name: &String,
-        configs: &Vec<ServiceConfig>,
+        app_name: &str,
+        configs: &[ServiceConfig],
         container_config: &ContainerConfig,
     ) -> Result<Vec<Service>, Error> {
         let network_id = self.create_or_get_network_id(app_name).await?;
@@ -259,7 +259,7 @@ impl DockerInfrastructure {
         Ok(services)
     }
 
-    async fn stop_services_impl(&self, app_name: &String) -> Result<Vec<Service>, Error> {
+    async fn stop_services_impl(&self, app_name: &str) -> Result<Vec<Service>, Error> {
         let container_details = match self
             .get_container_details(Some(app_name), None)
             .await?
@@ -295,8 +295,8 @@ impl DockerInfrastructure {
 
     async fn start_container(
         &self,
-        app_name: &String,
-        network_id: &String,
+        app_name: &str,
+        network_id: &str,
         service_config: &ServiceConfig,
         container_config: &ContainerConfig,
     ) -> Result<Service, Error> {
@@ -386,7 +386,7 @@ impl DockerInfrastructure {
     }
 
     fn create_container_options(
-        app_name: &String,
+        app_name: &str,
         service_config: &ServiceConfig,
         container_config: &ContainerConfig,
     ) -> ContainerOptions {
@@ -473,7 +473,7 @@ impl DockerInfrastructure {
 
     async fn pull_image(
         &self,
-        app_name: &String,
+        app_name: &str,
         config: &ServiceConfig,
     ) -> Result<(), ShipLiftError> {
         let image = config.image().to_string();
@@ -518,8 +518,8 @@ impl DockerInfrastructure {
 
     async fn get_app_containers(
         &self,
-        app_name: Option<&String>,
-        service_name: Option<&String>,
+        app_name: Option<&str>,
+        service_name: Option<&str>,
     ) -> Result<Vec<Container>, ShipLiftError> {
         let filters = vec![
             label_filter(APP_NAME_LABEL, app_name),
@@ -530,8 +530,8 @@ impl DockerInfrastructure {
 
     async fn get_status_change_containers(
         &self,
-        app_name: Option<&String>,
-        status_id: Option<&String>,
+        app_name: Option<&str>,
+        status_id: Option<&str>,
     ) -> Result<Vec<Container>, ShipLiftError> {
         let filters = vec![
             label_filter(APP_NAME_LABEL, app_name),
@@ -542,8 +542,8 @@ impl DockerInfrastructure {
 
     async fn get_app_container(
         &self,
-        app_name: &String,
-        service_name: &String,
+        app_name: &str,
+        service_name: &str,
     ) -> Result<Option<Container>, ShipLiftError> {
         self.get_app_containers(Some(app_name), Some(service_name))
             .await
@@ -552,8 +552,8 @@ impl DockerInfrastructure {
 
     async fn get_container_details(
         &self,
-        app_name: Option<&String>,
-        service_name: Option<&String>,
+        app_name: Option<&str>,
+        service_name: Option<&str>,
     ) -> Result<MultiMap<String, ContainerDetails>, Error> {
         debug!("Resolve container details for app {:?}", app_name);
 
@@ -603,9 +603,9 @@ impl Infrastructure for DockerInfrastructure {
 
     async fn deploy_services(
         &self,
-        status_id: &String,
-        app_name: &String,
-        configs: &Vec<ServiceConfig>,
+        status_id: &str,
+        app_name: &str,
+        configs: &[ServiceConfig],
         container_config: &ContainerConfig,
     ) -> Result<Vec<Service>, Error> {
         let deployment_container = self
@@ -621,7 +621,7 @@ impl Infrastructure for DockerInfrastructure {
         result
     }
 
-    async fn get_status_change(&self, status_id: &String) -> Result<Option<Vec<Service>>, Error> {
+    async fn get_status_change(&self, status_id: &str) -> Result<Option<Vec<Service>>, Error> {
         Ok(
             match self
                 .find_status_change_container(status_id)
@@ -649,11 +649,7 @@ impl Infrastructure for DockerInfrastructure {
     }
 
     /// Deletes all services for the given `app_name`.
-    async fn stop_services(
-        &self,
-        status_id: &String,
-        app_name: &String,
-    ) -> Result<Vec<Service>, Error> {
+    async fn stop_services(&self, status_id: &str, app_name: &str) -> Result<Vec<Service>, Error> {
         let deployment_container = self
             .create_status_change_container(status_id, app_name)
             .await?;
@@ -667,8 +663,8 @@ impl Infrastructure for DockerInfrastructure {
 
     async fn get_logs(
         &self,
-        app_name: &String,
-        service_name: &String,
+        app_name: &str,
+        service_name: &str,
         from: &Option<DateTime<FixedOffset>>,
         limit: usize,
     ) -> Result<Option<Vec<(DateTime<FixedOffset>, String)>>, failure::Error> {
@@ -738,8 +734,8 @@ impl Infrastructure for DockerInfrastructure {
 
     async fn change_status(
         &self,
-        app_name: &String,
-        service_name: &String,
+        app_name: &str,
+        service_name: &str,
         status: ServiceStatus,
     ) -> Result<Option<Service>, failure::Error> {
         match self.get_app_container(app_name, service_name).await? {
@@ -791,11 +787,11 @@ impl Infrastructure for DockerInfrastructure {
 }
 
 /// Helper function to build ContainerFilters
-fn label_filter(label_name: &str, label_value: Option<&String>) -> ContainerFilter {
+fn label_filter(label_name: &str, label_value: Option<&str>) -> ContainerFilter {
     let label_name = String::from(label_name);
     match label_value {
         None => ContainerFilter::LabelName(label_name),
-        Some(value) => ContainerFilter::Label(label_name, value.clone()),
+        Some(value) => ContainerFilter::Label(label_name, value.to_string()),
     }
 }
 
@@ -881,8 +877,8 @@ impl TryFrom<&ContainerDetails> for Service {
         };
 
         let mut builder = ServiceBuilder::new()
-            .id(container_details.id.clone())
-            .app_name(app_name.clone())
+            .id(&container_details.id)
+            .app_name(app_name)
             .config(ServiceConfig::try_from(container_details)?)
             .service_status(status)
             .started_at(started_at);

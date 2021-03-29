@@ -47,13 +47,13 @@ pub trait Infrastructure: Send + Sync {
     ///   must be able to find the corresponding services.
     async fn deploy_services(
         &self,
-        status_id: &String,
-        app_name: &String,
-        configs: &Vec<ServiceConfig>,
+        status_id: &str,
+        app_name: &str,
+        configs: &[ServiceConfig],
         container_config: &ContainerConfig,
     ) -> Result<Vec<Service>, Error>;
 
-    async fn get_status_change(&self, _status_id: &String) -> Result<Option<Vec<Service>>, Error> {
+    async fn get_status_change(&self, _status_id: &str) -> Result<Option<Vec<Service>>, Error> {
         Ok(None)
     }
 
@@ -61,17 +61,13 @@ pub trait Infrastructure: Send + Sync {
     ///
     /// The implementation must ensure that it returns the services that have been
     /// stopped.
-    async fn stop_services(
-        &self,
-        status_id: &String,
-        app_name: &String,
-    ) -> Result<Vec<Service>, Error>;
+    async fn stop_services(&self, status_id: &str, app_name: &str) -> Result<Vec<Service>, Error>;
 
     /// Returns the log lines with a the corresponding timestamps in it.
     async fn get_logs(
         &self,
-        app_name: &String,
-        service_name: &String,
+        app_name: &str,
+        service_name: &str,
         from: &Option<DateTime<FixedOffset>>,
         limit: usize,
     ) -> Result<Option<Vec<(DateTime<FixedOffset>, String)>>, Error>;
@@ -79,15 +75,15 @@ pub trait Infrastructure: Send + Sync {
     /// Changes the status of a service, for example, the service might me stopped or started.
     async fn change_status(
         &self,
-        app_name: &String,
-        service_name: &String,
+        app_name: &str,
+        service_name: &str,
         status: ServiceStatus,
     ) -> Result<Option<Service>, Error>;
 }
 
 impl dyn Infrastructure {
     /// Returns the configuration of all services running for the given application name.
-    pub async fn get_configs_of_app(&self, app_name: &String) -> Result<Vec<ServiceConfig>, Error> {
+    pub async fn get_configs_of_app(&self, app_name: &str) -> Result<Vec<ServiceConfig>, Error> {
         let services = self.get_services().await?;
         Ok(services
             .get_vec(app_name)

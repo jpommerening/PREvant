@@ -25,9 +25,8 @@
  */
 
 #![feature(proc_macro_hygiene, decl_macro)]
-
 #![allow(clippy::all)]
-#![deny(clippy::unnecessary_filter_map)]
+#![deny(clippy::ptr_arg)]
 
 #[macro_use]
 extern crate clap;
@@ -125,7 +124,7 @@ fn create_infrastructure(config: &Config) -> Result<Box<dyn Infrastructure>, Sta
                     let container_secret =
                         Path::new("/run/secrets/kubernetes.io/serviceaccount/ca.crt");
                     if container_secret.exists() {
-                        Some(read_ca_file(&PathBuf::from(container_secret))?)
+                        Some(read_ca_file(container_secret)?)
                     } else {
                         None
                     }
@@ -138,7 +137,7 @@ fn create_infrastructure(config: &Config) -> Result<Box<dyn Infrastructure>, Sta
                     let container_secret =
                         Path::new("/run/secrets/kubernetes.io/serviceaccount/token");
                     if container_secret.exists() {
-                        Some(read_token_file(&PathBuf::from(container_secret))?)
+                        Some(read_token_file(container_secret)?)
                     } else {
                         None
                     }
@@ -154,7 +153,7 @@ fn create_infrastructure(config: &Config) -> Result<Box<dyn Infrastructure>, Sta
     }
 }
 
-fn read_token_file(path: &PathBuf) -> Result<SecUtf8, StartUpError> {
+fn read_token_file(path: &Path) -> Result<SecUtf8, StartUpError> {
     debug!("Reading token from {}.", path.to_str().unwrap());
 
     let mut f = match File::open(path) {
@@ -178,7 +177,7 @@ fn read_token_file(path: &PathBuf) -> Result<SecUtf8, StartUpError> {
     Ok(SecUtf8::from(token))
 }
 
-fn read_ca_file(path: &PathBuf) -> Result<Vec<X509>, StartUpError> {
+fn read_ca_file(path: &Path) -> Result<Vec<X509>, StartUpError> {
     debug!(
         "Reading certificate authority from {}.",
         path.to_str().unwrap()

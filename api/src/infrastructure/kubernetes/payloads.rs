@@ -95,7 +95,7 @@ macro_rules! secret_name_from_name {
 }
 
 /// Creates a JSON payload suitable for [Kubernetes' Namespaces](https://kubernetes.io/docs/tasks/administer-cluster/namespaces/)
-pub fn namespace_payload(app_name: &String) -> V1Namespace {
+pub fn namespace_payload(app_name: &str) -> V1Namespace {
     serde_json::from_value(serde_json::json!({
       "apiVersion": "v1",
       "kind": "Namespace",
@@ -252,7 +252,7 @@ pub fn deployment_payload(
 }
 
 pub fn deployment_replicas_payload(
-    app_name: &String,
+    app_name: &str,
     service: &Service,
     replicas: u32,
 ) -> V1Deployment {
@@ -284,7 +284,7 @@ pub fn deployment_replicas_payload(
 
 /// Creates a JSON payload suitable for [Kubernetes' Secrets](https://kubernetes.io/docs/concepts/configuration/secret/)
 pub fn secrets_payload(
-    app_name: &String,
+    app_name: &str,
     service_config: &ServiceConfig,
     volumes: &BTreeMap<PathBuf, String>,
 ) -> V1Secret {
@@ -315,7 +315,7 @@ pub fn secrets_payload(
 }
 
 /// Creates a JSON payload suitable for [Kubernetes' Services](https://kubernetes.io/docs/concepts/services-networking/service/)
-pub fn service_payload(app_name: &String, service_config: &ServiceConfig) -> V1Service {
+pub fn service_payload(app_name: &str, service_config: &ServiceConfig) -> V1Service {
     serde_json::from_value(serde_json::json!({
       "apiVersion": "v1",
       "kind": "Service",
@@ -348,7 +348,7 @@ pub fn service_payload(app_name: &String, service_config: &ServiceConfig) -> V1S
 ///
 /// See [Traefik Routers](https://docs.traefik.io/v2.0/user-guides/crd-acme/#traefik-routers)
 /// for more information.
-pub fn ingress_route_payload(app_name: &String, service_config: &ServiceConfig) -> IngressRoute {
+pub fn ingress_route_payload(app_name: &str, service_config: &ServiceConfig) -> IngressRoute {
     serde_json::from_value(serde_json::json!({
       "apiVersion": "traefik.containo.us/v1alpha1",
       "kind": "IngressRoute",
@@ -389,7 +389,7 @@ pub fn ingress_route_payload(app_name: &String, service_config: &ServiceConfig) 
 ///
 /// See [Traefik Routers](https://docs.traefik.io/v2.0/user-guides/crd-acme/#traefik-routers)
 /// for more information.
-pub fn middleware_payload(app_name: &String, service_config: &ServiceConfig) -> Middleware {
+pub fn middleware_payload(app_name: &str, service_config: &ServiceConfig) -> Middleware {
     serde_json::from_value(serde_json::json!({
       "apiVersion": "traefik.containo.us/v1alpha1",
       "kind": "Middleware",

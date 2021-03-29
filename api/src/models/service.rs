@@ -236,13 +236,13 @@ impl ServiceBuilder {
         })
     }
 
-    pub fn id(mut self, id: String) -> Self {
-        self.id = Some(id);
+    pub fn id(mut self, id: &str) -> Self {
+        self.id = Some(id.to_string());
         self
     }
 
-    pub fn app_name(mut self, app_name: String) -> Self {
-        self.app_name = Some(app_name);
+    pub fn app_name(mut self, app_name: &str) -> Self {
+        self.app_name = Some(app_name.to_string());
         self
     }
 
@@ -381,8 +381,8 @@ mod tests {
         let started_at = Utc::now();
 
         let service = ServiceBuilder::new()
-            .id("some-random-id".to_string())
-            .app_name("master".to_string())
+            .id("some-random-id")
+            .app_name("master")
             .config(sc!("nginx", "nginx"))
             .started_at(started_at)
             .build()
@@ -398,8 +398,8 @@ mod tests {
     #[test]
     fn should_build_service_with_service_status() {
         let service = ServiceBuilder::new()
-            .id("some-random-id".to_string())
-            .app_name("master".to_string())
+            .id("some-random-id")
+            .app_name("master")
             .config(sc!("nginx", "nginx"))
             .started_at(Utc::now())
             .service_status(ServiceStatus::Paused)
@@ -414,8 +414,8 @@ mod tests {
         let url = Url::parse("http://example.com").unwrap();
 
         let service = ServiceBuilder::new()
-            .id("some-random-id".to_string())
-            .app_name("master".to_string())
+            .id("some-random-id")
+            .app_name("master")
             .config(sc!("nginx", "nginx"))
             .started_at(Utc::now())
             .base_url(url.clone())
@@ -433,8 +433,8 @@ mod tests {
         let meta = WebHostMeta::empty();
 
         let service = ServiceBuilder::new()
-            .id("some-random-id".to_string())
-            .app_name("master".to_string())
+            .id("some-random-id")
+            .app_name("master")
             .config(sc!("nginx", "nginx"))
             .started_at(Utc::now())
             .web_host_meta(meta.clone())
@@ -453,7 +453,7 @@ mod tests {
     #[test]
     fn should_not_build_service_missing_app_name() {
         let err = ServiceBuilder::new()
-            .id("some-container-id".to_string())
+            .id("some-container-id")
             .build()
             .unwrap_err();
 
@@ -463,8 +463,8 @@ mod tests {
     #[test]
     fn should_not_build_service_missing_config() {
         let err = ServiceBuilder::new()
-            .id("some-container-id".to_string())
-            .app_name("master".to_string())
+            .id("some-container-id")
+            .app_name("master")
             .build()
             .unwrap_err();
 

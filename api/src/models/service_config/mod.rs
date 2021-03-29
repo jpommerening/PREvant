@@ -83,8 +83,8 @@ impl ServiceConfig {
         &self.image
     }
 
-    pub fn set_service_name(&mut self, service_name: &String) {
-        self.service_name = service_name.clone()
+    pub fn set_service_name(&mut self, service_name: &str) {
+        self.service_name = service_name.to_string()
     }
 
     pub fn service_name(&self) -> &String {
@@ -155,7 +155,7 @@ impl ServiceConfig {
         }
     }
 
-    pub fn traefik_rule(&self, app_name: &String) -> String {
+    pub fn traefik_rule(&self, app_name: &str) -> String {
         match &self.router {
             None => format!("PathPrefix(`/{}/{}/`)", app_name, &self.service_name),
             Some(router) => router.rule.clone(),
@@ -173,7 +173,7 @@ impl ServiceConfig {
         }
     }
 
-    pub fn traefik_middlewares<'a, 'b: 'a>(&'b self, app_name: &String) -> BTreeMap<String, Value> {
+    pub fn traefik_middlewares<'a, 'b: 'a>(&'b self, app_name: &str) -> BTreeMap<String, Value> {
         match &self.middlewares {
             None => {
                 let mut prefixes = BTreeMap::new();

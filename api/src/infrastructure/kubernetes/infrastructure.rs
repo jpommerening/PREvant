@@ -205,7 +205,7 @@ impl KubernetesInfrastructure {
 
     async fn get_services_of_app(
         &self,
-        app_name: &String,
+        app_name: &str,
     ) -> Result<Vec<Service>, KubernetesInfrastructureError> {
         let mut p = ListParams::default();
         p.label_selector = Some(format!(
@@ -239,8 +239,8 @@ impl KubernetesInfrastructure {
 
     async fn get_service_of_app(
         &self,
-        app_name: &String,
-        service_name: &String,
+        app_name: &str,
+        service_name: &str,
     ) -> Result<Option<Service>, KubernetesInfrastructureError> {
         let mut p = ListParams::default();
         p.label_selector = Some(format!(
@@ -263,7 +263,7 @@ impl KubernetesInfrastructure {
 
     async fn post_service_and_custom_resource_definitions(
         &self,
-        app_name: &String,
+        app_name: &str,
         service_config: &ServiceConfig,
     ) -> Result<(), KubernetesInfrastructureError> {
         let mut p = ListParams::default();
@@ -274,21 +274,21 @@ impl KubernetesInfrastructure {
             SERVICE_NAME_LABEL,
             service_config.service_name(),
         ));
-        Api::namespaced(self.client()?, &app_name)
+        Api::namespaced(self.client()?, app_name)
             .create(
                 &PostParams::default(),
                 &service_payload(app_name, service_config),
             )
             .await?;
 
-        Api::namespaced(self.client()?, &app_name)
+        Api::namespaced(self.client()?, app_name)
             .create(
                 &PostParams::default(),
                 &ingress_route_payload(app_name, service_config),
             )
             .await?;
 
-        Api::namespaced(self.client()?, &app_name)
+        Api::namespaced(self.client()?, app_name)
             .create(
                 &PostParams::default(),
                 &middleware_payload(app_name, service_config),
@@ -300,7 +300,7 @@ impl KubernetesInfrastructure {
 
     async fn create_crds_if_necessary(
         &self,
-        _app_name: &String,
+        _app_name: &str,
     ) -> Result<(), KubernetesInfrastructureError> {
         let pp = PatchParams::default();
         let api: Api<CustomResourceDefinition> = Api::all(self.client()?);
@@ -321,7 +321,7 @@ impl KubernetesInfrastructure {
 
     async fn create_namespace_if_necessary(
         &self,
-        app_name: &String,
+        app_name: &str,
     ) -> Result<(), KubernetesInfrastructureError> {
         match Api::all(self.client()?)
             .create(&PostParams::default(), &namespace_payload(app_name))
@@ -347,7 +347,7 @@ impl KubernetesInfrastructure {
 
     async fn deploy_service<'a>(
         &self,
-        app_name: &String,
+        app_name: &str,
         service_config: &'a ServiceConfig,
         container_config: &ContainerConfig,
     ) -> Result<&'a ServiceConfig, KubernetesInfrastructureError> {
@@ -356,7 +356,7 @@ impl KubernetesInfrastructure {
                 .await?;
         }
 
-        match Api::namespaced(self.client()?, &app_name)
+        match Api::namespaced(self.client()?, app_name)
             .create(
                 &PostParams::default(),
                 &deployment_payload(app_name, service_config, container_config),
@@ -371,7 +371,7 @@ impl KubernetesInfrastructure {
             }
 
             Err(KubeError::Api(ErrorResponse { code, .. })) if code == 409 => {
-                Api::<V1Deployment>::namespaced(self.client()?, &app_name)
+                Api::<V1Deployment>::namespaced(self.client()?, app_name)
                     .patch(
                         &format!("{}-{}-deployment", app_name, service_config.service_name()),
                         &PatchParams::default(),
@@ -393,7 +393,7 @@ impl KubernetesInfrastructure {
 
     async fn deploy_secret(
         &self,
-        app_name: &String,
+        app_name: &str,
         service_config: &ServiceConfig,
         volumes: &BTreeMap<PathBuf, String>,
     ) -> Result<(), KubernetesInfrastructureError> {
@@ -403,7 +403,7 @@ impl KubernetesInfrastructure {
             app_name
         );
 
-        match Api::namespaced(self.client()?, &app_name)
+        match Api::namespaced(self.client()?, app_name)
             .create(
                 &PostParams::default(),
                 &secrets_payload(app_name, service_config, volumes),
@@ -415,7 +415,7 @@ impl KubernetesInfrastructure {
                 Ok(())
             }
             Err(KubeError::Api(ErrorResponse { code, .. })) if code == 409 => {
-                Api::<V1Secret>::namespaced(self.client()?, &app_name)
+                Api::<V1Secret>::namespaced(self.client()?, app_name)
                     .patch(
                         &format!("{}-{}-secret", app_name, service_config.service_name()),
                         &PatchParams::default(),
@@ -433,7 +433,7 @@ impl KubernetesInfrastructure {
 
     async fn stop_service<'a, 'b: 'a>(
         &'b self,
-        app_name: &String,
+        app_name: &str,
         service: &'a Service,
     ) -> Result<&'a Service, KubernetesInfrastructureError> {
         Api::<V1Deployment>::namespaced(self.client()?, &service.app_name())
@@ -491,9 +491,9 @@ impl Infrastructure for KubernetesInfrastructure {
 
     async fn deploy_services(
         &self,
-        _status_id: &String,
-        app_name: &String,
-        configs: &Vec<ServiceConfig>,
+        _status_id: &str,
+        app_name: &str,
+        configs: &[ServiceConfig],
         container_config: &ContainerConfig,
     ) -> Result<Vec<Service>, Error> {
         self.create_crds_if_necessary(app_name).await?;
@@ -512,11 +512,7 @@ impl Infrastructure for KubernetesInfrastructure {
         Ok(self.get_services_of_app(app_name).await?)
     }
 
-    async fn stop_services(
-        &self,
-        _status_id: &String,
-        app_name: &String,
-    ) -> Result<Vec<Service>, Error> {
+    async fn stop_services(&self, _status_id: &str, app_name: &str) -> Result<Vec<Service>, Error> {
         let services = self.get_services_of_app(app_name).await?;
         if services.is_empty() {
             return Ok(services);
@@ -524,7 +520,7 @@ impl Infrastructure for KubernetesInfrastructure {
 
         let futures = services
             .iter()
-            .map(|service| self.stop_service(&app_name, &service))
+            .map(|service| self.stop_service(app_name, &service))
             .collect::<Vec<_>>();
 
         for stop_service_result in join_all(futures).await {
@@ -541,8 +537,8 @@ impl Infrastructure for KubernetesInfrastructure {
 
     async fn get_logs(
         &self,
-        app_name: &String,
-        service_name: &String,
+        app_name: &str,
+        service_name: &str,
         from: &Option<DateTime<FixedOffset>>,
         limit: usize,
     ) -> Result<Option<Vec<(DateTime<FixedOffset>, String)>>, Error> {
@@ -551,7 +547,7 @@ impl Infrastructure for KubernetesInfrastructure {
             "{}={},{}={}",
             APP_NAME_LABEL, app_name, SERVICE_NAME_LABEL, service_name,
         ));
-        let pod = match Api::<V1Pod>::namespaced(self.client()?, &app_name)
+        let pod = match Api::<V1Pod>::namespaced(self.client()?, app_name)
             .list(&p)
             .await?
             .into_iter()
@@ -580,7 +576,7 @@ impl Infrastructure for KubernetesInfrastructure {
             })
             .filter(|since_seconds| since_seconds > &0);
 
-        let logs = Api::<V1Pod>::namespaced(self.client()?, &app_name)
+        let logs = Api::<V1Pod>::namespaced(self.client()?, app_name)
             .logs(&pod.metadata.name.unwrap(), &p)
             .await?;
 
@@ -611,8 +607,8 @@ impl Infrastructure for KubernetesInfrastructure {
 
     async fn change_status(
         &self,
-        app_name: &String,
-        service_name: &String,
+        app_name: &str,
+        service_name: &str,
         status: ServiceStatus,
     ) -> Result<Option<Service>, Error> {
         let (service, replicas) = match self.get_service_of_app(app_name, service_name).await? {
@@ -624,7 +620,7 @@ impl Infrastructure for KubernetesInfrastructure {
             None => return Ok(None),
         };
 
-        Api::<V1Deployment>::namespaced(self.client()?, &app_name)
+        Api::<V1Deployment>::namespaced(self.client()?, app_name)
             .patch(
                 &format!("{}-{}-deployment", app_name, service_name),
                 &PatchParams::default(),
@@ -646,12 +642,12 @@ impl TryFrom<V1Deployment> for ServiceBuilder {
             },
         )?;
         let mut builder = ServiceBuilder::new()
-            .id(name.clone())
+            .id(name)
             .config(ServiceConfig::try_from(&deployment)?);
 
         let labels = deployment.metadata.labels;
         builder = match labels.as_ref().and_then(|l| l.get(APP_NAME_LABEL)) {
-            Some(app_name) => builder.app_name(app_name.clone()),
+            Some(app_name) => builder.app_name(app_name),
             None => {
                 return Err(KubernetesInfrastructureError::MissingAppNameLabel {
                     deployment_name: name.to_string(),

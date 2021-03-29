@@ -36,10 +36,10 @@ use std::collections::BTreeMap;
 use std::str::FromStr;
 
 impl ServiceConfig {
-    pub fn apply_templating(&self, app_name: &String) -> Result<Self, TemplateRenderError> {
+    pub fn apply_templating(&self, app_name: &str) -> Result<Self, TemplateRenderError> {
         let parameters = TemplateParameters {
             application: ApplicationTemplateParameter {
-                name: app_name.clone(),
+                name: app_name.to_string(),
             },
             services: None,
             service: Some(ServiceTemplateParameter {
@@ -54,12 +54,12 @@ impl ServiceConfig {
 
     pub fn apply_templating_for_service_companion(
         &self,
-        app_name: &String,
+        app_name: &str,
         service_config: &Self,
     ) -> Result<Self, TemplateRenderError> {
         let parameters = TemplateParameters {
             application: ApplicationTemplateParameter {
-                name: app_name.clone(),
+                name: app_name.to_string(),
             },
             services: None,
             service: Some(ServiceTemplateParameter {
@@ -74,12 +74,12 @@ impl ServiceConfig {
 
     pub fn apply_templating_for_application_companion(
         &self,
-        app_name: &String,
-        service_configs: &Vec<Self>,
+        app_name: &str,
+        service_configs: &[Self],
     ) -> Result<Self, TemplateRenderError> {
         let parameters = TemplateParameters {
             application: ApplicationTemplateParameter {
-                name: app_name.clone(),
+                name: app_name.to_string(),
             },
             services: Some(
                 service_configs

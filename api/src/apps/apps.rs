@@ -160,11 +160,11 @@ impl AppsService {
 
     async fn configs_to_replicate(
         &self,
-        services_to_deploy: &Vec<ServiceConfig>,
-        app_name: &String,
-        replicate_from_app_name: &String,
+        services_to_deploy: &[ServiceConfig],
+        app_name: &str,
+        replicate_from_app_name: &str,
     ) -> Result<Vec<ServiceConfig>, AppsServiceError> {
-        let running_services = self.infrastructure.get_configs_of_app(&app_name).await?;
+        let running_services = self.infrastructure.get_configs_of_app(app_name).await?;
         let running_service_names = running_services
             .iter()
             .filter(|c| c.container_type() == &ContainerType::Instance)
@@ -178,7 +178,7 @@ impl AppsService {
 
         Ok(self
             .infrastructure
-            .get_configs_of_app(&replicate_from_app_name)
+            .get_configs_of_app(replicate_from_app_name)
             .await?
             .into_iter()
             .filter(|config| !service_names.contains(config.service_name()))
@@ -221,7 +221,7 @@ impl AppsService {
         app_name: &AppName,
         status_id: &AppStatusChangeId,
         replicate_from: Option<AppName>,
-        service_configs: &Vec<ServiceConfig>,
+        service_configs: &[ServiceConfig],
     ) -> Result<Vec<Service>, AppsServiceError> {
         let guard = self.create_or_get_app_guard(app_name.clone(), AppGuardKind::Deployment)?;
 
@@ -243,9 +243,9 @@ impl AppsService {
         app_name: &AppName,
         status_id: &AppStatusChangeId,
         replicate_from: Option<AppName>,
-        service_configs: &Vec<ServiceConfig>,
+        service_configs: &[ServiceConfig],
     ) -> Result<Vec<Service>, AppsServiceError> {
-        let mut configs: Vec<ServiceConfig> = service_configs.clone();
+        let mut configs: Vec<ServiceConfig> = service_configs.to_vec();
 
         let replicate_from_app_name =
             replicate_from.unwrap_or_else(|| AppName::from_str("master").unwrap());
@@ -328,7 +328,7 @@ impl AppsService {
     pub async fn get_logs(
         &self,
         app_name: &AppName,
-        service_name: &String,
+        service_name: &str,
         since: &Option<DateTime<FixedOffset>>,
         limit: usize,
     ) -> Result<Option<LogChunk>, AppsServiceError> {
@@ -345,8 +345,8 @@ impl AppsService {
 
     pub async fn change_status(
         &self,
-        app_name: &String,
-        service_name: &String,
+        app_name: &str,
+        service_name: &str,
         status: ServiceStatus,
     ) -> Result<Option<Service>, AppsServiceError> {
         Ok(self
@@ -902,8 +902,8 @@ Log msg 3 of service-a of app master
         assert_eq!(
             deleted_services,
             vec![ServiceBuilder::new()
-                .id("service-a".to_string())
-                .app_name("master".to_string())
+                .id("service-a")
+                .app_name("master")
                 .config(sc!("service-a"))
                 .started_at(
                     DateTime::parse_from_rfc3339("2019-07-18T07:25:00.000000000Z")

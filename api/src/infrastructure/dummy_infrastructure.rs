@@ -77,8 +77,8 @@ impl Infrastructure for DummyInfrastructure {
         for (app, configs) in services.iter_all() {
             for config in configs {
                 let service = ServiceBuilder::new()
-                    .id(format!("{}-{}", app.clone(), config.service_name()))
-                    .app_name(app.clone())
+                    .id(&format!("{}-{}", app.clone(), config.service_name()))
+                    .app_name(app)
                     .config(config.clone())
                     .service_status(ServiceStatus::Running)
                     .started_at(
@@ -98,9 +98,9 @@ impl Infrastructure for DummyInfrastructure {
 
     async fn deploy_services(
         &self,
-        _status_id: &String,
-        app_name: &String,
-        configs: &Vec<ServiceConfig>,
+        _status_id: &str,
+        app_name: &str,
+        configs: &[ServiceConfig],
         _container_config: &ContainerConfig,
     ) -> Result<Vec<Service>, failure::Error> {
         self.delay_if_configured().await;
@@ -118,15 +118,15 @@ impl Infrastructure for DummyInfrastructure {
 
         for config in configs {
             info!("started {} for {}.", config.service_name(), app_name);
-            services.insert(app_name.clone(), config.clone());
+            services.insert(app_name.to_string(), config.clone());
         }
         Ok(vec![])
     }
 
     async fn stop_services(
         &self,
-        _status_id: &String,
-        app_name: &String,
+        _status_id: &str,
+        app_name: &str,
     ) -> Result<Vec<Service>, failure::Error> {
         self.delay_if_configured().await;
 
@@ -136,8 +136,8 @@ impl Infrastructure for DummyInfrastructure {
                 .into_iter()
                 .map(|sc| {
                     ServiceBuilder::new()
-                        .app_name(app_name.clone())
-                        .id(sc.service_name().clone())
+                        .app_name(app_name)
+                        .id(sc.service_name())
                         .config(sc)
                         .started_at(
                             DateTime::parse_from_rfc3339("2019-07-18T07:25:00.000000000Z")
@@ -154,8 +154,8 @@ impl Infrastructure for DummyInfrastructure {
 
     async fn get_logs(
         &self,
-        app_name: &String,
-        service_name: &String,
+        app_name: &str,
+        service_name: &str,
         _from: &Option<DateTime<FixedOffset>>,
         _limit: usize,
     ) -> Result<Option<Vec<(DateTime<FixedOffset>, String)>>, failure::Error> {
@@ -177,8 +177,8 @@ impl Infrastructure for DummyInfrastructure {
 
     async fn change_status(
         &self,
-        _app_name: &String,
-        _service_name: &String,
+        _app_name: &str,
+        _service_name: &str,
         _status: ServiceStatus,
     ) -> Result<Option<Service>, failure::Error> {
         Ok(None)
